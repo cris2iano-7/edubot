@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
+app.set('trust proxy',1);
 app.use(helmet());
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10kb' }));
@@ -184,7 +185,7 @@ app.post('/chat', bearerAuth, async (req, res) => {
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: message.trim() }
         ],
-        max_tokens: 1000,
+        max_tokens: 300,
         temperature: 0.7
       })
     });
