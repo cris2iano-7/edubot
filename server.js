@@ -180,7 +180,7 @@ app.post('/chat', bearerAuth, async (req, res) => {
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: message.trim() }
@@ -193,9 +193,18 @@ app.post('/chat', bearerAuth, async (req, res) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Groq error:', data);
-      return res.status(502).json({ error: 'AI service error' });
-    }
+  console.error('Groq error:', data);
+
+  if (response.status === 429) {
+    return res.json({
+      reply: 'Rate limit reached. Please try again in a few seconds.'
+    });
+  }
+
+  return res.status(502).json({
+    error: 'AI service error'
+  });
+}
 
     res.json({ reply: data.choices[0].message.content });
 
